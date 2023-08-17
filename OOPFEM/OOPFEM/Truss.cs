@@ -36,13 +36,17 @@ namespace OOPFEM
         internal DenseMatrix ComputeStiffnessMatrix()
         {
             DenseMatrix Ke = new DenseMatrix(TArray.Length);
-            Node n1 = nodes[0];
-            Node n2 = nodes[1];
-            double Cy = (n2.GetLocation(1) - n1.GetLocation(1)) / GetLength();
-            double Cz = (n2.GetLocation(2) - n1.GetLocation(2)) / GetLength();
-            double Cx = (n2.GetLocation(0) - n1.GetLocation(0)) / GetLength();
-            double EAL = E * A * GetLength();
-
+            double x1 = nodes[0].GetLocation(0);
+            double y1 = nodes[0].GetLocation(1);
+            double z1 = nodes[0].GetLocation(2);
+            double x2 = nodes[1].GetLocation(0);
+            double y2 = nodes[1].GetLocation(1);
+            double z2 = nodes[1].GetLocation(2);
+            double L = GetLength();
+            double Cx = (x2 - x1) / L;
+            double Cy = (y2 - y1) / L;
+            double Cz = (z2 - z1) / L;
+            double EAL = E * A / L;
             Ke[0, 0] = EAL * Cx * Cx;
             Ke[0, 1] = Ke[1, 0] = EAL * Cx * Cy;
             Ke[0, 2] = Ke[2, 0] = EAL * Cx * Cz;
@@ -69,7 +73,6 @@ namespace OOPFEM
             Ke[4, 5] = Ke[5, 4] = EAL * Cy * Cz;
 
             Ke[5, 5] = EAL * Cz * Cz;
-
             return Ke;
         }
     }

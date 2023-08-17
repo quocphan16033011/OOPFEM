@@ -91,7 +91,7 @@ namespace OOPFEM
             //viewer.Run();
             double E = 1.2e6;
             double A1 = 0.302;
-            double A2 = 0.709;
+            double A2 = 0.729;
             double A3 = 0.187;
             double f = 1000;
 
@@ -123,6 +123,7 @@ namespace OOPFEM
 
             model.PreProcessing();
             model.Solve();
+            //model.PostProcessing();
 
             ViewerForm viewer = new ViewerForm(true);
             model.DrawNode(viewer);
@@ -130,11 +131,10 @@ namespace OOPFEM
             model.DrawConstraint(viewer, 10);
             double scale = 1e-2;
             model.DrawForce(viewer, scale);
+            model.DrawDeformation(viewer, 10);
+            model.DrawReactionFroces(viewer, 0.1);
             viewer.UpdateCamera();
             viewer.Run();
-
-
-
         }
 
         static List<Vertex> CreatVertaxList(double x0, double y0, double x1, double y1, int numEdge0, int numEdge1)
