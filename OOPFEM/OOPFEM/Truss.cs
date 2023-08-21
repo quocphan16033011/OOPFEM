@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace OOPFEM
 {
-    class Truss3DElement
+    class Truss3DElement : AbstractELement
     {
-        private double E { get; set; }
         private double A { get; set; }
-        private Node[] nodes;
-        public int[] TArray { get; set; }
 
         public Truss3DElement(double E, double A, Node node1, Node node2)
         {
@@ -24,16 +21,8 @@ namespace OOPFEM
         {
             return nodes[0].GetDistance(nodes[1]);
         }
-        public Node GetNode(int index)
-        {
-            return nodes[index];
-        }
-        public int CountNodes()
-        {
-            return nodes.Length;
-        }
 
-        internal DenseMatrix ComputeStiffnessMatrix()
+        internal override DenseMatrix ComputeStiffnessMatrix()
         {
             DenseMatrix Ke = new DenseMatrix(TArray.Length);
             double x1 = nodes[0].GetLocation(0);

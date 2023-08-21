@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace OOPFEM
 {
-    class Force
+    class Force : AbstractLoad
     {
-        private double[] valueForce;
         private Node node;
 
         public Force(Node node, double fx, double fy, double fz)
@@ -21,12 +20,8 @@ namespace OOPFEM
         {
             return node;
         }
-        public double GetValueForce(int direction)
-        {
-            return valueForce[direction];
-        }
 
-        internal DenseVector ComputeVectorFroce()
+        internal override DenseVector ComputeVectorFroce()
         {
             return new DenseVector(valueForce);
         }

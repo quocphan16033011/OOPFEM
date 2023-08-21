@@ -4,6 +4,23 @@
         <name>MessagePack</name>
     </assembly>
     <members>
+        <member name="T:System.Numerics.BitOperations">
+            <summary>
+            Utility methods for intrinsic bit-twiddling operations.
+            The methods use hardware intrinsics when available on the underlying platform,
+            otherwise they use optimized software fallbacks.
+            </summary>
+        </member>
+        <member name="M:System.Numerics.BitOperations.RotateLeft(System.UInt32,System.Int32)">
+            <summary>
+            Rotates the specified value left by the specified number of bits.
+            Similar in behavior to the x86 instruction ROL.
+            </summary>
+            <param name="value">The value to rotate.</param>
+            <param name="offset">The number of bits to rotate by.
+            Any value outside the range [0..31] is treated as congruent mod 32.</param>
+            <returns>The rotated value.</returns>
+        </member>
         <member name="T:MessagePack.Formatters.CollectionHelpers`2">
             <summary>
             Provides general helpers for creating collections (including dictionaries).
@@ -87,6 +104,17 @@
             Serializes any instance of <see cref="T:System.Type"/> by its <see cref="P:System.Type.AssemblyQualifiedName"/> value.
             </summary>
             <typeparam name="T">The <see cref="T:System.Type"/> class itself or a derived type.</typeparam>
+        </member>
+        <member name="T:MessagePack.Formatters.StringInterningFormatter">
+            <summary>
+            A <see cref="T:System.String" /> formatter that interns strings on deserialization.
+            </summary>
+        </member>
+        <member name="M:MessagePack.Formatters.StringInterningFormatter.Deserialize(MessagePack.MessagePackReader@,MessagePack.MessagePackSerializerOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MessagePack.Formatters.StringInterningFormatter.Serialize(MessagePack.MessagePackWriter@,System.String,MessagePack.MessagePackSerializerOptions)">
+            <inheritdoc/>
         </member>
         <member name="T:MessagePack.Formatters.ForceTypelessFormatter`1">
             <summary>
@@ -466,7 +494,7 @@
             <summary>
             Advances the reader to the next MessagePack primitive to be read.
             </summary>
-            <returns><c>true</c> if the entire structure beginning at the current <see cref="P:MessagePack.MessagePackReader.Position"/> is found in the <see cref="P:MessagePack.MessagePackReader.Sequence"/>; <c>false</c> otherwise.</returns>
+            <returns><see langword="true"/> if the entire structure beginning at the current <see cref="P:MessagePack.MessagePackReader.Position"/> is found in the <see cref="P:MessagePack.MessagePackReader.Sequence"/>; <see langword="false"/> otherwise.</returns>
             <remarks>
             The entire primitive is skipped, including content of maps or arrays, or any other type with payloads.
             To get the raw MessagePack sequence that was skipped, use <see cref="M:MessagePack.MessagePackReader.ReadRaw"/> instead.
@@ -483,7 +511,7 @@
             <summary>
             Reads nil if it is the next token.
             </summary>
-            <returns><c>true</c> if the next token was nil; <c>false</c> otherwise.</returns>
+            <returns><see langword="true"/> if the next token was nil; <see langword="false"/> otherwise.</returns>
             <exception cref="T:System.IO.EndOfStreamException">Thrown if the end of the sequence provided to the constructor is reached before the expected end of the data.</exception>
         </member>
         <member name="M:MessagePack.MessagePackReader.ReadRaw(System.Int64)">
@@ -524,10 +552,10 @@
             if there is sufficient buffer to read it.
             </summary>
             <param name="count">Receives the number of elements in the array if the entire array header could be read.</param>
-            <returns><c>true</c> if there was sufficient buffer and an array header was found; <c>false</c> if the buffer incompletely describes an array header.</returns>
+            <returns><see langword="true"/> if there was sufficient buffer and an array header was found; <see langword="false"/> if the buffer incompletely describes an array header.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown if a code other than an array header is encountered.</exception>
             <remarks>
-            When this method returns <c>false</c> the position of the reader is left in an undefined position.
+            When this method returns <see langword="false"/> the position of the reader is left in an undefined position.
             The caller is expected to recreate the reader (presumably with a longer sequence to read from) before continuing.
             </remarks>
         </member>
@@ -554,10 +582,10 @@
             if there is sufficient buffer to read it.
             </summary>
             <param name="count">Receives the number of key=value pairs in the map if the entire map header can be read.</param>
-            <returns><c>true</c> if there was sufficient buffer and a map header was found; <c>false</c> if the buffer incompletely describes an map header.</returns>
+            <returns><see langword="true"/> if there was sufficient buffer and a map header was found; <see langword="false"/> if the buffer incompletely describes an map header.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown if a code other than an map header is encountered.</exception>
             <remarks>
-            When this method returns <c>false</c> the position of the reader is left in an undefined position.
+            When this method returns <see langword="false"/> the position of the reader is left in an undefined position.
             The caller is expected to recreate the reader (presumably with a longer sequence to read from) before continuing.
             </remarks>
         </member>
@@ -644,7 +672,7 @@
             or something between <see cref="F:MessagePack.MessagePackCode.MinFixStr"/> and <see cref="F:MessagePack.MessagePackCode.MaxFixStr"/>.
             </summary>
             <returns>
-            A sequence of bytes, or <c>null</c> if the read token is <see cref="F:MessagePack.MessagePackCode.Nil"/>.
+            A sequence of bytes, or <see langword="null"/> if the read token is <see cref="F:MessagePack.MessagePackCode.Nil"/>.
             The data is a slice from the original sequence passed to this reader's constructor.
             </returns>
         </member>
@@ -657,7 +685,7 @@
             or a code between <see cref="F:MessagePack.MessagePackCode.MinFixStr"/> and <see cref="F:MessagePack.MessagePackCode.MaxFixStr"/>.
             </summary>
             <returns>
-            The sequence of bytes, or <c>null</c> if the read token is <see cref="F:MessagePack.MessagePackCode.Nil"/>.
+            The sequence of bytes, or <see langword="null"/> if the read token is <see cref="F:MessagePack.MessagePackCode.Nil"/>.
             The data is a slice from the original sequence passed to this reader's constructor.
             </returns>
         </member>
@@ -671,12 +699,12 @@
             </summary>
             <param name="span">Receives the span to the string.</param>
             <returns>
-            <c>true</c> if the string is contiguous in memory such that it could be set as a single span.
-            <c>false</c> if the read token is <see cref="F:MessagePack.MessagePackCode.Nil"/> or the string is not in a contiguous span.
+            <see langword="true"/> if the string is contiguous in memory such that it could be set as a single span.
+            <see langword="false"/> if the read token is <see cref="F:MessagePack.MessagePackCode.Nil"/> or the string is not in a contiguous span.
             </returns>
             <remarks>
-            Callers should generally be prepared for a <c>false</c> result and failover to calling <see cref="M:MessagePack.MessagePackReader.ReadStringSequence"/>
-            which can represent a <c>null</c> result and handle strings that are not contiguous in memory.
+            Callers should generally be prepared for a <see langword="false"/> result and failover to calling <see cref="M:MessagePack.MessagePackReader.ReadStringSequence"/>
+            which can represent a <see langword="null"/> result and handle strings that are not contiguous in memory.
             </remarks>
         </member>
         <member name="M:MessagePack.MessagePackReader.ReadString">
@@ -687,7 +715,7 @@
             <see cref="F:MessagePack.MessagePackCode.Str32"/>,
             or a code between <see cref="F:MessagePack.MessagePackCode.MinFixStr"/> and <see cref="F:MessagePack.MessagePackCode.MaxFixStr"/>.
             </summary>
-            <returns>A string, or <c>null</c> if the current msgpack token is <see cref="F:MessagePack.MessagePackCode.Nil"/>.</returns>
+            <returns>A string, or <see langword="null"/> if the current msgpack token is <see cref="F:MessagePack.MessagePackCode.Nil"/>.</returns>
         </member>
         <member name="M:MessagePack.MessagePackReader.ReadExtensionFormatHeader">
             <summary>
@@ -725,7 +753,7 @@
             <returns>The number of key=value pairs in the map.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown if a code other than an extension format header is encountered.</exception>
             <remarks>
-            When this method returns <c>false</c> the position of the reader is left in an undefined position.
+            When this method returns <see langword="false"/> the position of the reader is left in an undefined position.
             The caller is expected to recreate the reader (presumably with a longer sequence to read from) before continuing.
             </remarks>
         </member>
@@ -770,14 +798,14 @@
             Throws <see cref="T:System.IO.EndOfStreamException"/> if a condition is false.
             </summary>
             <param name="condition">A boolean value.</param>
-            <exception cref="T:System.IO.EndOfStreamException">Thrown if <paramref name="condition"/> is <c>false</c>.</exception>
+            <exception cref="T:System.IO.EndOfStreamException">Thrown if <paramref name="condition"/> is <see langword="false"/>.</exception>
         </member>
         <member name="M:MessagePack.MessagePackReader.TryGetStringLengthInBytes(System.Int32@)">
             <summary>
             Gets the length of the next string.
             </summary>
             <param name="length">Receives the length of the next string, if there were enough bytes to read it.</param>
-            <returns><c>true</c> if there were enough bytes to read the length of the next string; <c>false</c> otherwise.</returns>
+            <returns><see langword="true"/> if there were enough bytes to read the length of the next string; <see langword="false"/> otherwise.</returns>
         </member>
         <member name="M:MessagePack.MessagePackReader.GetStringLengthInBytes">
             <summary>
@@ -842,7 +870,7 @@
             </summary>
             <param name="writer">The buffer writer to serialize with.</param>
             <param name="value">The value to serialize.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during serialization.</exception>
         </member>
@@ -852,7 +880,7 @@
             </summary>
             <param name="writer">The buffer writer to serialize with.</param>
             <param name="value">The value to serialize.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during serialization.</exception>
         </member>
         <member name="M:MessagePack.MessagePackSerializer.Serialize``1(``0,MessagePack.MessagePackSerializerOptions,System.Threading.CancellationToken)">
@@ -860,7 +888,7 @@
             Serializes a given value with the specified buffer writer.
             </summary>
             <param name="value">The value to serialize.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>A byte array with the serialized value.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during serialization.</exception>
@@ -871,7 +899,7 @@
             </summary>
             <param name="stream">The stream to serialize to.</param>
             <param name="value">The value to serialize.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during serialization.</exception>
         </member>
@@ -881,7 +909,7 @@
             </summary>
             <param name="stream">The stream to serialize to.</param>
             <param name="value">The value to serialize.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>A task that completes with the result of the async serialization operation.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during serialization.</exception>
@@ -892,7 +920,7 @@
             </summary>
             <typeparam name="T">The type of value to deserialize.</typeparam>
             <param name="byteSequence">The sequence to deserialize from.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>The deserialized value.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during deserialization.</exception>
@@ -903,7 +931,7 @@
             </summary>
             <typeparam name="T">The type of value to deserialize.</typeparam>
             <param name="reader">The reader to deserialize from.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <returns>The deserialized value.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during deserialization.</exception>
         </member>
@@ -913,7 +941,7 @@
             </summary>
             <typeparam name="T">The type of value to deserialize.</typeparam>
             <param name="buffer">The buffer to deserialize from.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>The deserialized value.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during deserialization.</exception>
@@ -935,7 +963,7 @@
             </summary>
             <typeparam name="T">The type of value to deserialize.</typeparam>
             <param name="buffer">The memory to deserialize from.</param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="bytesRead">The number of bytes read.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>The deserialized value.</returns>
@@ -951,7 +979,7 @@
             The entire stream will be read, and the first msgpack token deserialized will be returned.
             If <see cref="P:System.IO.Stream.CanSeek"/> is true on the stream, its position will be set to just after the last deserialized byte.
             </param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>The deserialized value.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during deserialization.</exception>
@@ -969,7 +997,7 @@
             The entire stream will be read, and the first msgpack token deserialized will be returned.
             If <see cref="P:System.IO.Stream.CanSeek"/> is true on the stream, its position will be set to just after the last deserialized byte.
             </param>
-            <param name="options">The options. Use <c>null</c> to use default options.</param>
+            <param name="options">The options. Use <see langword="null"/> to use default options.</param>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>The deserialized value.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown when any error occurs during deserialization.</exception>
@@ -1061,6 +1089,16 @@
         <member name="M:MessagePack.MessagePackSerializer.Deserialize(System.Type,System.Buffers.ReadOnlySequence{System.Byte},MessagePack.MessagePackSerializerOptions,System.Threading.CancellationToken)">
             <seealso cref="M:MessagePack.MessagePackSerializer.Deserialize``1(System.Buffers.ReadOnlySequence{System.Byte}@,MessagePack.MessagePackSerializerOptions,System.Threading.CancellationToken)"/>
         </member>
+        <member name="M:MessagePack.MessagePackSerializer.SerializeSemiGeneric``1(MessagePack.MessagePackWriter@,System.Object,MessagePack.MessagePackSerializerOptions)">
+            <summary>
+            Helper method used by reflection.
+            </summary>
+        </member>
+        <member name="M:MessagePack.MessagePackSerializer.DeserializeSemiGeneric``1(MessagePack.MessagePackReader@,MessagePack.MessagePackSerializerOptions)">
+            <summary>
+            Helper method used by reflection.
+            </summary>
+        </member>
         <member name="T:MessagePack.MessagePackStreamReader">
             <summary>
             Reads one or more messagepack data structures from a <see cref="T:System.IO.Stream"/>.
@@ -1088,12 +1126,12 @@
             </summary>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>
-            A task whose result is the next whole data structure from the stream, or <c>null</c> if the stream ends.
+            A task whose result is the next whole data structure from the stream, or <see langword="null"/> if the stream ends.
             The returned sequence is valid until this <see cref="T:MessagePack.MessagePackStreamReader"/> is disposed or
             until this method is called again, whichever comes first.
             </returns>
             <remarks>
-            When <c>null</c> is the result of the returned task,
+            When <see langword="null"/> is the result of the returned task,
             any extra bytes read (between the last complete message and the end of the stream) will be available via the <see cref="P:MessagePack.MessagePackStreamReader.RemainingBytes"/> property.
             </remarks>
         </member>
@@ -1102,7 +1140,7 @@
             Reads an array header from <see cref="P:MessagePack.MessagePackStreamReader.ReadData"/> if there are enough bytes to do so.
             </summary>
             <param name="length">Receives the length of the array, if its header could be read.</param>
-            <returns><c>true</c> if the array header was found and complete; <c>false</c> if there were insufficient bytes to read the header.</returns>
+            <returns><see langword="true"/> if the array header was found and complete; <see langword="false"/> if there were insufficient bytes to read the header.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown if the next msgpack structure is not an array header.</exception>
         </member>
         <member name="M:MessagePack.MessagePackStreamReader.ReadMapHeaderAsync(System.Threading.CancellationToken)">
@@ -1122,7 +1160,7 @@
             Reads a map header from <see cref="P:MessagePack.MessagePackStreamReader.ReadData"/> if there are enough bytes to do so.
             </summary>
             <param name="count">Receives the size of the map, if its header could be read.</param>
-            <returns><c>true</c> if the map header was found and complete; <c>false</c> if there were insufficient bytes to read the header.</returns>
+            <returns><see langword="true"/> if the map header was found and complete; <see langword="false"/> if there were insufficient bytes to read the header.</returns>
             <exception cref="T:MessagePack.MessagePackSerializationException">Thrown if the next msgpack structure is not a map header.</exception>
         </member>
         <member name="M:MessagePack.MessagePackStreamReader.#ctor(System.IO.Stream)">
@@ -1162,12 +1200,12 @@
             </summary>
             <param name="cancellationToken">A cancellation token.</param>
             <returns>
-            A task whose result is the next whole data structure from the stream, or <c>null</c> if the stream ends.
+            A task whose result is the next whole data structure from the stream, or <see langword="null"/> if the stream ends.
             The returned sequence is valid until this <see cref="T:MessagePack.MessagePackStreamReader"/> is disposed or
             until this method is called again, whichever comes first.
             </returns>
             <remarks>
-            When <c>null</c> is the result of the returned task,
+            When <see langword="null"/> is the result of the returned task,
             any extra bytes read (between the last complete message and the end of the stream) will be available via the <see cref="P:MessagePack.MessagePackStreamReader.RemainingBytes"/> property.
             </remarks>
         </member>
@@ -1200,14 +1238,14 @@
             Read more data from the stream into the <see cref="P:MessagePack.MessagePackStreamReader.ReadData"/> buffer.
             </summary>
             <param name="cancellationToken">A cancellation token.</param>
-            <returns><c>true</c> if more data was read; <c>false</c> if the end of the stream had already been reached.</returns>
+            <returns><see langword="true"/> if more data was read; <see langword="false"/> if the end of the stream had already been reached.</returns>
         </member>
         <member name="M:MessagePack.MessagePackStreamReader.TryReadNextMessage(System.Buffers.ReadOnlySequence{System.Byte}@)">
             <summary>
             Checks whether the content in <see cref="P:MessagePack.MessagePackStreamReader.ReadData"/> include a complete messagepack structure.
             </summary>
             <param name="completeMessage">Receives the sequence of the first complete data structure found, if any.</param>
-            <returns><c>true</c> if a complete data structure was found; <c>false</c> otherwise.</returns>
+            <returns><see langword="true"/> if a complete data structure was found; <see langword="false"/> otherwise.</returns>
         </member>
         <member name="T:MessagePack.BufferWriter">
             <summary>
@@ -1322,7 +1360,7 @@
             Gets an <see cref="T:MessagePack.Formatters.IMessagePackFormatter`1"/> instance that can serialize or deserialize some type <typeparamref name="T"/>.
             </summary>
             <typeparam name="T">The type of value to be serialized or deserialized.</typeparam>
-            <returns>A formatter, if this resolver supplies one for type <typeparamref name="T"/>; otherwise <c>null</c>.</returns>
+            <returns>A formatter, if this resolver supplies one for type <typeparamref name="T"/>; otherwise <see langword="null"/>.</returns>
         </member>
         <member name="T:MessagePack.LZ4.LZ4Codec">
             <summary>Unsafe LZ4 codec.</summary>
@@ -1466,7 +1504,7 @@
             This can mitigate some denial of service attacks when deserializing untrusted code.
             </summary>
             <value>
-            The value is <c>false</c> for <see cref="F:MessagePack.MessagePackSecurity.TrustedData"/> and <c>true</c> for <see cref="F:MessagePack.MessagePackSecurity.UntrustedData"/>.
+            The value is <see langword="false"/> for <see cref="F:MessagePack.MessagePackSecurity.TrustedData"/> and <see langword="true"/> for <see cref="F:MessagePack.MessagePackSecurity.UntrustedData"/>.
             </value>
         </member>
         <member name="P:MessagePack.MessagePackSecurity.MaximumObjectGraphDepth">
@@ -1626,8 +1664,8 @@
             <summary>
             Gets the resolver to use for complex types.
             </summary>
-            <value>An instance of <see cref="T:MessagePack.IFormatterResolver"/>. Never <c>null</c>.</value>
-            <exception cref="T:System.ArgumentNullException">Thrown if an attempt is made to set this property to <c>null</c>.</exception>
+            <value>An instance of <see cref="T:MessagePack.IFormatterResolver"/>. Never <see langword="null"/>.</value>
+            <exception cref="T:System.ArgumentNullException">Thrown if an attempt is made to set this property to <see langword="null"/>.</exception>
         </member>
         <member name="P:MessagePack.MessagePackSerializerOptions.Compression">
             <summary>
@@ -1637,6 +1675,26 @@
             When set to something other than <see cref="F:MessagePack.MessagePackCompression.None"/>,
             deserialization can still work on uncompressed sequences,
             and serialization may not compress if msgpack sequences are short enough that compression would not likely be advantageous.
+            </remarks>
+        </member>
+        <member name="P:MessagePack.MessagePackSerializerOptions.CompressionMinLength">
+            <summary>
+            Gets the length a serialized msgpack result must equal or exceed before <see cref="P:MessagePack.MessagePackSerializerOptions.Compression"/> is applied.
+            </summary>
+            <value>The default value is 64.</value>
+            <remarks>
+            When compression is <em>not</em> applied due to a short serialized result, deserialization will still succeed
+            even if <see cref="P:MessagePack.MessagePackSerializerOptions.Compression"/> is set to something other than <see cref="F:MessagePack.MessagePackCompression.None"/>.
+            </remarks>
+        </member>
+        <member name="P:MessagePack.MessagePackSerializerOptions.SuggestedContiguousMemorySize">
+            <summary>
+            Gets the size of contiguous memory blocks in bytes that may be allocated for buffering purposes.
+            </summary>
+            <value>The default value is 1MB.</value>
+            <remarks>
+            Larger values may perform a bit faster, but may result in adding a runtime perf tax due to using the
+            <see href="https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap">Large Object Heap</see>.
             </remarks>
         </member>
         <member name="P:MessagePack.MessagePackSerializerOptions.OldSpec">
@@ -1657,13 +1715,13 @@
             <summary>
             Gets a value indicating whether serialization should omit assembly version, culture and public key token metadata when using the typeless formatter.
             </summary>
-            <value>The default value is <c>false</c>.</value>
+            <value>The default value is <see langword="false"/>.</value>
         </member>
         <member name="P:MessagePack.MessagePackSerializerOptions.AllowAssemblyVersionMismatch">
             <summary>
             Gets a value indicating whether deserialization may instantiate types from an assembly with a different version if a matching version cannot be found.
             </summary>
-            <value>The default value is <c>false</c>.</value>
+            <value>The default value is <see langword="false"/>.</value>
         </member>
         <member name="P:MessagePack.MessagePackSerializerOptions.Security">
             <summary>
@@ -1684,7 +1742,7 @@
             Gets a type given a string representation of the type.
             </summary>
             <param name="typeName">The name of the type to load. This is typically the <see cref="P:System.Type.AssemblyQualifiedName"/> but may use the assembly's simple name.</param>
-            <returns>The loaded type or <c>null</c> if no matching type could be found.</returns>
+            <returns>The loaded type or <see langword="null"/> if no matching type could be found.</returns>
         </member>
         <member name="M:MessagePack.MessagePackSerializerOptions.ThrowIfDeserializingTypeIsDisallowed(System.Type)">
             <summary>
@@ -1711,6 +1769,20 @@
             Gets a copy of these options with the <see cref="P:MessagePack.MessagePackSerializerOptions.Compression"/> property set to a new value.
             </summary>
             <param name="compression">The new value for the <see cref="P:MessagePack.MessagePackSerializerOptions.Compression"/> property.</param>
+            <returns>The new instance; or the original if the value is unchanged.</returns>
+        </member>
+        <member name="M:MessagePack.MessagePackSerializerOptions.WithCompressionMinLength(System.Int32)">
+            <summary>
+            Gets a copy of these options with the <see cref="P:MessagePack.MessagePackSerializerOptions.CompressionMinLength"/> property set to a new value.
+            </summary>
+            <param name="compressionMinLength">The new value for the <see cref="P:MessagePack.MessagePackSerializerOptions.CompressionMinLength"/> property. Must be a positive integer.</param>
+            <returns>The new instance; or the original if the value is unchanged.</returns>
+        </member>
+        <member name="M:MessagePack.MessagePackSerializerOptions.WithSuggestedContiguousMemorySize(System.Int32)">
+            <summary>
+            Gets a copy of these options with the <see cref="P:MessagePack.MessagePackSerializerOptions.SuggestedContiguousMemorySize"/> property set to a new value.
+            </summary>
+            <param name="suggestedContiguousMemorySize">The new value for the <see cref="P:MessagePack.MessagePackSerializerOptions.SuggestedContiguousMemorySize"/> property. Must be at least 256.</param>
             <returns>The new instance; or the original if the value is unchanged.</returns>
         </member>
         <member name="M:MessagePack.MessagePackSerializerOptions.WithOldSpec(System.Nullable{System.Boolean})">
@@ -2022,9 +2094,9 @@
             <see cref="F:MessagePack.MessagePackCode.Bin8"/>,
             <see cref="F:MessagePack.MessagePackCode.Bin16"/>,
             <see cref="F:MessagePack.MessagePackCode.Bin32"/>,
-            or <see cref="F:MessagePack.MessagePackCode.Nil"/> if <paramref name="src"/> is <c>null</c>.
+            or <see cref="F:MessagePack.MessagePackCode.Nil"/> if <paramref name="src"/> is <see langword="null"/>.
             </summary>
-            <param name="src">The array of bytes to write. May be <c>null</c>.</param>
+            <param name="src">The array of bytes to write. May be <see langword="null"/>.</param>
         </member>
         <member name="M:MessagePack.MessagePackWriter.Write(System.ReadOnlySpan{System.Byte})">
             <summary>
@@ -2035,7 +2107,7 @@
             </summary>
             <param name="src">The span of bytes to write.</param>
             <remarks>
-            When <see cref="P:MessagePack.MessagePackWriter.OldSpec"/> is <c>true</c>, the msgpack code used is <see cref="F:MessagePack.MessagePackCode.Str8"/>, <see cref="F:MessagePack.MessagePackCode.Str16"/> or <see cref="F:MessagePack.MessagePackCode.Str32"/> instead.
+            When <see cref="P:MessagePack.MessagePackWriter.OldSpec"/> is <see langword="true"/>, the msgpack code used is <see cref="F:MessagePack.MessagePackCode.Str8"/>, <see cref="F:MessagePack.MessagePackCode.Str16"/> or <see cref="F:MessagePack.MessagePackCode.Str32"/> instead.
             </remarks>
         </member>
         <member name="M:MessagePack.MessagePackWriter.Write(System.Buffers.ReadOnlySequence{System.Byte}@)">
@@ -2047,7 +2119,7 @@
             </summary>
             <param name="src">The span of bytes to write.</param>
             <remarks>
-            When <see cref="P:MessagePack.MessagePackWriter.OldSpec"/> is <c>true</c>, the msgpack code used is <see cref="F:MessagePack.MessagePackCode.Str8"/>, <see cref="F:MessagePack.MessagePackCode.Str16"/> or <see cref="F:MessagePack.MessagePackCode.Str32"/> instead.
+            When <see cref="P:MessagePack.MessagePackWriter.OldSpec"/> is <see langword="true"/>, the msgpack code used is <see cref="F:MessagePack.MessagePackCode.Str8"/>, <see cref="F:MessagePack.MessagePackCode.Str16"/> or <see cref="F:MessagePack.MessagePackCode.Str32"/> instead.
             </remarks>
         </member>
         <member name="M:MessagePack.MessagePackWriter.WriteBinHeader(System.Int32)">
@@ -2065,7 +2137,7 @@
             Alternatively a single call to <see cref="M:MessagePack.MessagePackWriter.Write(System.ReadOnlySpan{System.Byte})"/> or <see cref="M:MessagePack.MessagePackWriter.Write(System.Buffers.ReadOnlySequence{System.Byte}@)"/> will take care of the header and content in one call.
             </para>
             <para>
-            When <see cref="P:MessagePack.MessagePackWriter.OldSpec"/> is <c>true</c>, the msgpack code used is <see cref="F:MessagePack.MessagePackCode.Str8"/>, <see cref="F:MessagePack.MessagePackCode.Str16"/> or <see cref="F:MessagePack.MessagePackCode.Str32"/> instead.
+            When <see cref="P:MessagePack.MessagePackWriter.OldSpec"/> is <see langword="true"/>, the msgpack code used is <see cref="F:MessagePack.MessagePackCode.Str8"/>, <see cref="F:MessagePack.MessagePackCode.Str16"/> or <see cref="F:MessagePack.MessagePackCode.Str32"/> instead.
             </para>
             </remarks>
         </member>
@@ -2111,7 +2183,7 @@
             <see cref="F:MessagePack.MessagePackCode.Str8"/>,
             <see cref="F:MessagePack.MessagePackCode.Str16"/>,
             <see cref="F:MessagePack.MessagePackCode.Str32"/>,
-            or <see cref="F:MessagePack.MessagePackCode.Nil"/> if the <paramref name="value"/> is <c>null</c>.
+            or <see cref="F:MessagePack.MessagePackCode.Nil"/> if the <paramref name="value"/> is <see langword="null"/>.
             </summary>
             <param name="value">The value to write. May be null.</param>
         </member>
@@ -2212,6 +2284,20 @@
             <param name="estimatedOffset">The offset obtained from a prior call to <see cref="M:MessagePack.MessagePackWriter.WriteString_PrepareSpan(System.Int32,System.Int32@,System.Int32@)"/>.</param>
             <param name="byteCount">The number of bytes used to actually encode the string.</param>
         </member>
+        <member name="M:MessagePack.MessagePackWriter.GetEncodedLength(System.Int64)">
+            <summary>
+            Get the number of bytes required to encode a value in msgpack.
+            </summary>
+            <param name="value">The value to encode.</param>
+            <returns>The byte length; One of 1, 2, 3, 5 or 9 bytes.</returns>
+        </member>
+        <member name="M:MessagePack.MessagePackWriter.GetEncodedLength(System.UInt64)">
+            <summary>
+            Get the number of bytes required to encode a value in msgpack.
+            </summary>
+            <param name="value">The value to encode.</param>
+            <returns>The byte length; One of 1, 2, 3, 5 or 9 bytes.</returns>
+        </member>
         <member name="T:MessagePack.MonoProtection">
             <summary>
             Special behavior for running on the mono runtime.
@@ -2271,7 +2357,7 @@
             Looks up a formatter for a type that has not been previously cached.
             </summary>
             <typeparam name="T">The type to be formatted.</typeparam>
-            <returns>The formatter to use, or <c>null</c> if none found.</returns>
+            <returns>The formatter to use, or <see langword="null"/> if none found.</returns>
         </member>
         <member name="T:MessagePack.Resolvers.CompositeResolver">
             <summary>
@@ -2472,7 +2558,7 @@
         </member>
         <member name="T:MessagePack.Resolvers.StaticCompositeResolver">
             <summary>
-            Singleton version of CompositeResolver, which be able to register a collection of formatters and resolvers to a single instance.
+            Singleton version of <see cref="T:MessagePack.Resolvers.CompositeResolver"/>, which can register a collection of formatters and resolvers to a single instance.
             </summary>
         </member>
         <member name="M:MessagePack.Resolvers.StaticCompositeResolver.Register(MessagePack.Formatters.IMessagePackFormatter[])">
@@ -2517,7 +2603,7 @@
             Gets an <see cref="T:MessagePack.Formatters.IMessagePackFormatter`1"/> instance that can serialize or deserialize some type <typeparamref name="T"/>.
             </summary>
             <typeparam name="T">The type of value to be serialized or deserialized.</typeparam>
-            <returns>A formatter, if this resolver supplies one for type <typeparamref name="T"/>; otherwise <c>null</c>.</returns>
+            <returns>A formatter, if this resolver supplies one for type <typeparamref name="T"/>; otherwise <see langword="null"/>.</returns>
         </member>
         <member name="T:MessagePack.Resolvers.TypelessContractlessStandardResolver">
             <summary>
@@ -2775,7 +2861,7 @@
             Move the reader ahead the specified number of items
             if there are enough elements remaining in the sequence.
             </summary>
-            <returns><c>true</c> if there were enough elements to advance; otherwise <c>false</c>.</returns>
+            <returns><see langword="true"/> if there were enough elements to advance; otherwise <see langword="false"/>.</returns>
         </member>
         <member name="M:MessagePack.SequenceReader`1.TryCopyTo(System.Span{`0})">
             <summary>
@@ -2804,7 +2890,7 @@
             </summary>
             <param name="reader">The reader to read from.</param>
             <param name="value">Receives the value read.</param>
-            <returns><c>true</c> if there was another byte in the sequence; <c>false</c> otherwise.</returns>
+            <returns><see langword="true"/> if there was another byte in the sequence; <see langword="false"/> otherwise.</returns>
         </member>
         <member name="M:MessagePack.SequenceReaderExtensions.TryReadBigEndian(MessagePack.SequenceReader{System.Byte}@,System.Int16@)">
             <summary>
@@ -2969,22 +3055,11 @@
             A value indicating whether we're running on mono.
             </summary>
         </member>
-        <member name="T:System.Numerics.BitOperations">
+        <member name="M:MessagePack.Utilities.GetEntryEnumerator(System.Collections.IDictionary)">
             <summary>
-            Utility methods for intrinsic bit-twiddling operations.
-            The methods use hardware intrinsics when available on the underlying platform,
-            otherwise they use optimized software fallbacks.
+            Gets an <see cref="T:System.Collections.IDictionary"/> enumerator that does not allocate for each entry,
+            and that doesn't produce the nullable ref annotation warning about unboxing a possibly null value.
             </summary>
-        </member>
-        <member name="M:System.Numerics.BitOperations.RotateLeft(System.UInt32,System.Int32)">
-            <summary>
-            Rotates the specified value left by the specified number of bits.
-            Similar in behavior to the x86 instruction ROL.
-            </summary>
-            <param name="value">The value to rotate.</param>
-            <param name="offset">The number of bits to rotate by.
-            Any value outside the range [0..31] is treated as congruent mod 32.</param>
-            <returns>The rotated value.</returns>
         </member>
         <member name="T:Nerdbank.Streams.Sequence`1">
             <summary>
@@ -3033,6 +3108,18 @@
             The <see cref="T:System.Buffers.MemoryPool`1"/> in use may itself have a minimum array length as well,
             in which case the higher of the two minimums dictate the minimum array size that will be allocated.
             </para>
+            <para>
+            If <see cref="P:Nerdbank.Streams.Sequence`1.AutoIncreaseMinimumSpanLength"/> is <see langword="true"/>, this value may be automatically increased as the length of a sequence grows.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Nerdbank.Streams.Sequence`1.AutoIncreaseMinimumSpanLength">
+            <summary>
+            Gets or sets a value indicating whether the <see cref="P:Nerdbank.Streams.Sequence`1.MinimumSpanLength"/> should be
+            intelligently increased as the length of the sequence grows.
+            </summary>
+            <remarks>
+            This can help prevent long sequences made up of many very small arrays.
             </remarks>
         </member>
         <member name="P:Nerdbank.Streams.Sequence`1.AsReadOnlySequence">
@@ -3088,6 +3175,16 @@
             <param name="sizeHint">The size of the memory required, or 0 to just get a convenient (non-empty) buffer.</param>
             <returns>The requested memory.</returns>
         </member>
+        <member name="M:Nerdbank.Streams.Sequence`1.Append(System.ReadOnlyMemory{`0})">
+            <summary>
+            Adds an existing memory location to this sequence without copying.
+            </summary>
+            <param name="memory">The memory to add.</param>
+            <remarks>
+            This *may* leave significant slack space in a previously allocated block if calls to <see cref="M:Nerdbank.Streams.Sequence`1.Append(System.ReadOnlyMemory{`0})"/>
+            follow calls to <see cref="M:Nerdbank.Streams.Sequence`1.GetMemory(System.Int32)"/> or <see cref="M:Nerdbank.Streams.Sequence`1.GetSpan(System.Int32)"/>.
+            </remarks>
+        </member>
         <member name="M:Nerdbank.Streams.Sequence`1.Dispose">
             <summary>
             Clears the entire sequence, recycles associated memory into pools,
@@ -3135,7 +3232,7 @@
         <member name="P:Nerdbank.Streams.Sequence`1.SequenceSegment.MemoryOwner">
             <summary>
             Gets the tracker for the underlying array for this segment, which can be used to recycle the array when we're disposed of.
-            Will be <c>null</c> if using an array pool, in which case the memory is held by <see cref="F:Nerdbank.Streams.Sequence`1.SequenceSegment.array"/>.
+            Will be <see langword="null"/> if using an array pool, in which case the memory is held by <see cref="F:Nerdbank.Streams.Sequence`1.SequenceSegment.array"/>.
             </summary>
         </member>
         <member name="P:Nerdbank.Streams.Sequence`1.SequenceSegment.AvailableMemory">
@@ -3159,6 +3256,11 @@
             Gets or sets the next segment in the singly linked list of segments.
             </summary>
         </member>
+        <member name="P:Nerdbank.Streams.Sequence`1.SequenceSegment.IsForeignMemory">
+            <summary>
+            Gets a value indicating whether this segment refers to memory that came from outside and that we cannot write to nor recycle.
+            </summary>
+        </member>
         <member name="M:Nerdbank.Streams.Sequence`1.SequenceSegment.Assign(System.Buffers.IMemoryOwner{`0})">
             <summary>
             Assigns this (recyclable) segment a new area in memory.
@@ -3170,6 +3272,12 @@
             Assigns this (recyclable) segment a new area in memory.
             </summary>
             <param name="array">An array drawn from an <see cref="T:System.Buffers.ArrayPool`1"/>.</param>
+        </member>
+        <member name="M:Nerdbank.Streams.Sequence`1.SequenceSegment.AssignForeign(System.ReadOnlyMemory{`0})">
+            <summary>
+            Assigns this (recyclable) segment a new area in memory.
+            </summary>
+            <param name="memory">A memory block obtained from outside, that we do not own and should not recycle.</param>
         </member>
         <member name="M:Nerdbank.Streams.Sequence`1.SequenceSegment.ResetMemory(System.Buffers.ArrayPool{`0})">
             <summary>
@@ -3213,7 +3321,7 @@
             <param name="value">The value of the argument.</param>
             <param name="parameterName">The name of the parameter to include in any thrown exception.</param>
             <returns>The value of the parameter.</returns>
-            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="value"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="value"/> is <see langword="null"/>.</exception>
         </member>
         <member name="M:Nerdbank.Streams.Requires.Argument(System.Boolean,System.String,System.String)">
             <summary>

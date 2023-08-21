@@ -11,7 +11,7 @@ namespace OOPFEM
         private double[] location;
         private double[] u;
         public int[] TArray { get; set; }
-        public Node(double x, double y, double z)
+        public Node(double x, double y, double z=0)
         {
             location = new double[] { x, y, z };
             u = new double[3];

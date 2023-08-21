@@ -204,3 +204,6 @@ E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\obj\Debug\OOPFEM.csproj.CoreCompileInputs.cac
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\obj\Debug\OOPFEM.csproj.CopyComplete
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\obj\Debug\OOPFEM.exe
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\obj\Debug\OOPFEM.pdb
+E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.dll
+E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.pdb
+E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.xml

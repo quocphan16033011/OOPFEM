@@ -16,7 +16,7 @@ namespace OOPFEM
     {
         private List<Node> listNodes;
 
-        private List<Truss3DElement> listElements;
+        private List<AbstractELement> listElements;
         private List<Force> listForces;
         private List<Constraint> listConstraints;
 
@@ -24,7 +24,7 @@ namespace OOPFEM
         public Model(int numberOfField)
         {
             listNodes = new List<Node>();
-            listElements = new List<Truss3DElement>();
+            listElements = new List<AbstractELement>();
             listForces = new List<Force>();
             listConstraints = new List<Constraint>();
             NumberOfFeild = numberOfField;
@@ -37,11 +37,11 @@ namespace OOPFEM
         {
             return listNodes[index];
         }
-        public Truss3DElement GetElement(int Elementindex)
+        public AbstractELement GetElement(int Elementindex)
         {
             return listElements[Elementindex];
         }
-        public void AddElement(Truss3DElement element)
+        public void AddElement(AbstractELement element)
         {
             listElements.Add(element);
         }
@@ -83,19 +83,34 @@ namespace OOPFEM
             int countElement = listElements.Count;
             for (int i = 0; i < countElement; i++)
             {
-                Node n0 = listElements[i].GetNode(0);
-                Node n1 = listElements[i].GetNode(1);
-                Line line = new Line(
-                        n0.GetLocation(0),
-                        n0.GetLocation(1),
-                        n0.GetLocation(2),
-                        n1.GetLocation(0),
-                        n1.GetLocation(1),
-                        n1.GetLocation(2)
-                    );
-                line.SetColor(Color.Green);
-                line.SetWidth(2);
-                viewer.AddObject3D(line);
+                if (listElements[i] is Truss3DElement)
+                {
+                    Node n0 = listElements[i].GetNode(0);
+                    Node n1 = listElements[i].GetNode(1);
+                    Line line = new Line(
+                            n0.GetLocation(0),
+                            n0.GetLocation(1),
+                            n0.GetLocation(2),
+                            n1.GetLocation(0),
+                            n1.GetLocation(1),
+                            n1.GetLocation(2)
+                        );
+                    line.SetColor(Color.Green);
+                    line.SetWidth(2);
+                    viewer.AddObject3D(line);
+                }
+                else if (listElements[i] is T3Elements)
+                {
+                    Node n0 = listElements[i].GetNode(0);
+                    Node n1 = listElements[i].GetNode(1);
+                    Node n2 = listElements[i].GetNode(2);
+                    Triangle tri = new Triangle(n0.GetLocation(0), n0.GetLocation(1), n0.GetLocation(2),
+                        n1.GetLocation(0), n1.GetLocation(1), n1.GetLocation(2),
+                        n2.GetLocation(0), n2.GetLocation(1), n2.GetLocation(2));
+                    //tri.SetRandomColor();
+                    tri.SetColor(Color.Green);
+                    viewer.AddObject3D(tri);
+                }
             }
         }
         public void DrawForce(ViewerForm viewer, double scale = 1)
@@ -197,7 +212,7 @@ namespace OOPFEM
             }
             for (int i = 0; i < listElements.Count; i++)
             {
-                Truss3DElement element = listElements[i];
+                AbstractELement element = listElements[i];
                 int numberOfNodes = element.CountNodes();
                 element.TArray = new int[numberOfNodes * NumberOfFeild];
                 int c = 0;
@@ -289,7 +304,7 @@ namespace OOPFEM
             DenseMatrix K = new DenseMatrix(listNodes.Count * NumberOfFeild);
             for (int i = 0; i < listElements.Count; i++)
             {
-                Truss3DElement element = listElements[i];
+                AbstractELement element = listElements[i];
                 DenseMatrix Ke = element.ComputeStiffnessMatrix();
                 int[] tArrayElement = element.TArray;
                 for (int j = 0; j < tArrayElement.Count(); j++)

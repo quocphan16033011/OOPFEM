@@ -89,50 +89,80 @@ namespace OOPFEM
             //viewer.UpdateCamera();
 
             //viewer.Run();
-            double E = 1.2e6;
-            double A1 = 0.302;
-            double A2 = 0.729;
-            double A3 = 0.187;
-            double f = 1000;
+            //double E = 1.2e6;
+            //double A1 = 0.302;
+            //double A2 = 0.729;
+            //double A3 = 0.187;
+            //double f = 1000;
 
-            List<Node> nodes = new List<Node>();
-            List<Truss3DElement> elements = new List<Truss3DElement>();
-            nodes.Add(new Node(72, 0, 0));
-            nodes.Add(new Node(0, 36, 0));
-            nodes.Add(new Node(0, 36, 72));
-            nodes.Add(new Node(0, 0, -48));
-            Truss3DElement elem1 = new Truss3DElement(E, A1, nodes[0], nodes[1]);
-            Truss3DElement elem2 = new Truss3DElement(E, A2, nodes[0], nodes[2]);
-            Truss3DElement elem3 = new Truss3DElement(E, A3, nodes[0], nodes[3]);
-            Constraint c1 = new Constraint(nodes[1], true, true, true);
-            Constraint c2 = new Constraint(nodes[2], true, true, true);
-            Constraint c3 = new Constraint(nodes[3], true, true, true);
-            Force force = new Force(nodes[0], 0, 0, -f);
-            Model model = new Model(3);
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                model.AddNode(nodes[i]);
-            }
-            model.AddElement(elem1);
-            model.AddElement(elem2);
-            model.AddElement(elem3);
-            model.AddForce(force);
-            model.AddConstrain(c1);
-            model.AddConstrain(c2);
-            model.AddConstrain(c3);
+            //List<Node> nodes = new List<Node>();
+            //List<Truss3DElement> elements = new List<Truss3DElement>();
+            //nodes.Add(new Node(72, 0, 0));
+            //nodes.Add(new Node(0, 36, 0));
+            //nodes.Add(new Node(0, 36, 72));
+            //nodes.Add(new Node(0, 0, -48));
+            //Truss3DElement elem1 = new Truss3DElement(E, A1, nodes[0], nodes[1]);
+            //Truss3DElement elem2 = new Truss3DElement(E, A2, nodes[0], nodes[2]);
+            //Truss3DElement elem3 = new Truss3DElement(E, A3, nodes[0], nodes[3]);
+            //Constraint c1 = new Constraint(nodes[1], true, true, true);
+            //Constraint c2 = new Constraint(nodes[2], true, true, true);
+            //Constraint c3 = new Constraint(nodes[3], true, true, true);
+            //Force force = new Force(nodes[0], 0, 0, -f);
+            //Model model = new Model(3);
+            //for (int i = 0; i < nodes.Count; i++)
+            //{
+            //    model.AddNode(nodes[i]);
+            //}
+            //model.AddElement(elem1);
+            //model.AddElement(elem2);
+            //model.AddElement(elem3);
+            //model.AddForce(force);
+            //model.AddConstrain(c1);
+            //model.AddConstrain(c2);
+            //model.AddConstrain(c3);
 
-            model.PreProcessing();
-            model.Solve();
-            //model.PostProcessing();
+            //model.PreProcessing();
+            //model.Solve();
+            ////model.PostProcessing();
+
+            //ViewerForm viewer = new ViewerForm(true);
+            //model.DrawNode(viewer);
+            //model.DrawElement(viewer);
+            //model.DrawConstraint(viewer, 10);
+            //double scale = 1e-2;
+            //model.DrawForce(viewer, scale);
+            //model.DrawDeformation(viewer, 10);
+            //model.DrawReactionFroces(viewer, 0.1);
+            //viewer.UpdateCamera();
+            //viewer.Run();
+
+            double E = 10e9;
+            double nu = 0.25;
+            Node n1 = new Node(0, 0);
+            Node n2 = new Node(0, 2);
+            Node n3 = new Node(2, 0);
+            Node n4 = new Node(2, 2);
+
+            Model model = new Model(2);
+            model.AddNode(n1);
+            model.AddNode(n2);
+            model.AddNode(n3);
+            model.AddNode(n4);
+
+            Constraint c1 = new Constraint(n1, true, true, false);
+            Constraint c2 = new Constraint(n3, true, true, false);
 
             ViewerForm viewer = new ViewerForm(true);
+
+            T3Elements element = new T3Elements(E, nu, n1, n3, n2);
+            T3Elements element1 = new T3Elements(E, nu, n4, n2, n3);
+            model.AddElement(element);
+            model.AddElement(element1);
+            model.AddConstrain(c1);
+            model.AddConstrain(c2); 
             model.DrawNode(viewer);
             model.DrawElement(viewer);
-            model.DrawConstraint(viewer, 10);
-            double scale = 1e-2;
-            model.DrawForce(viewer, scale);
-            model.DrawDeformation(viewer, 10);
-            model.DrawReactionFroces(viewer, 0.1);
+            model.DrawConstraint(viewer,1e-1);
             viewer.UpdateCamera();
             viewer.Run();
         }
