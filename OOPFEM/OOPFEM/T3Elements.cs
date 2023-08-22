@@ -17,6 +17,7 @@ namespace OOPFEM
             this.nu = nu;
             this.nodes = new Node[] { node1, node2, node3 };
         }
+        
         public double GetArea()
         {
             double x1 = nodes[0].GetLocation(0);
@@ -41,8 +42,8 @@ namespace OOPFEM
             DenseMatrix D = new DenseMatrix(3);
             double a = E / (1 - nu * nu);
             D[0, 0] = a;
-            D[0, 0] = D[1, 0] = a * nu;
-            D[1, 1] = nu;
+            D[1, 0] = D[0, 1] = a * nu;
+            D[1, 1] = a;
             D[2, 2] = a * (1 - nu) / 2.0;
             DenseMatrix B = new DenseMatrix(3, 6);
             B[0, 0] = B[2, 1] = (y2 - y3) / (2 * A);
@@ -51,7 +52,7 @@ namespace OOPFEM
             B[1, 1] = B[2, 0] = (x3 - x2) / (2 * A);
             B[1, 3] = B[2, 2] = (x1 - x3) / (2 * A);
             B[1, 5] = B[2, 4] = (x2 - x1) / (2 * A);
-            Ke = (DenseMatrix)(A*B.Transpose()*D*B);
+            Ke = (DenseMatrix)(A * B.Transpose() * D * B);
             return Ke;
         }
     }

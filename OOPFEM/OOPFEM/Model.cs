@@ -17,7 +17,7 @@ namespace OOPFEM
         private List<Node> listNodes;
 
         private List<AbstractELement> listElements;
-        private List<Force> listForces;
+        private List<AbstractLoad> listForces;
         private List<Constraint> listConstraints;
 
         public int NumberOfFeild { get; set; }
@@ -25,7 +25,7 @@ namespace OOPFEM
         {
             listNodes = new List<Node>();
             listElements = new List<AbstractELement>();
-            listForces = new List<Force>();
+            listForces = new List<AbstractLoad>();
             listConstraints = new List<Constraint>();
             NumberOfFeild = numberOfField;
         }
@@ -45,11 +45,11 @@ namespace OOPFEM
         {
             listElements.Add(element);
         }
-        public Force GetForce(int indexForce)
+        public AbstractLoad GetForce(int indexForce)
         {
             return listForces[indexForce];
         }
-        public void AddForce(Force force)
+        public void AddForce(AbstractLoad force)
         {
             listForces.Add(force);
         }
@@ -117,17 +117,36 @@ namespace OOPFEM
         {
             for (int i = 0; i < listForces.Count; i++)
             {
-                Node n = listForces[i].GetNode();
-                Line line = new Line(
-                        n.GetLocation(0),
-                        n.GetLocation(1),
-                        n.GetLocation(2),
-                        n.GetLocation(0) + scale * listForces[i].GetValueForce(0),
-                        n.GetLocation(1) + scale * listForces[i].GetValueForce(1),
-                        n.GetLocation(2) + scale * listForces[i].GetValueForce(2));
-                line.SetColor(Color.Red);
-                line.SetWidth(3);
-                viewer.AddObject3D(line);
+                if (listForces[i] is Force)
+                {
+                    Node n = ((Force)listForces[i]).GetNode();
+                    Line line = new Line(
+                            n.GetLocation(0),
+                            n.GetLocation(1),
+                            n.GetLocation(2),
+                            n.GetLocation(0) + scale * listForces[i].GetValueForce(0),
+                            n.GetLocation(1) + scale * listForces[i].GetValueForce(1),
+                            n.GetLocation(2) + scale * listForces[i].GetValueForce(2));
+                    line.SetColor(Color.Red);
+                    line.SetWidth(3);
+                    viewer.AddObject3D(line);
+                }
+                else if (listForces[i] is PressureEdge2D)
+                {
+                    Node[] nodes = ((PressureEdge2D)listForces[i]).GetNodesOnEdge();
+                    double xc = (nodes[0].GetLocation(0) + nodes[1].GetLocation(0)) / 2.0;
+                    double yc = (nodes[0].GetLocation(1) + nodes[1].GetLocation(1)) / 2.0;
+                    Line line = new Line(
+                           xc,
+                           yc,
+                           0,
+                           xc + scale * listForces[i].GetValueForce(0),
+                           yc + scale * listForces[i].GetValueForce(1),
+                           0);
+                    line.SetColor(Color.Red);
+                    line.SetWidth(3);
+                    viewer.AddObject3D(line);
+                }
             }
         }
         public void DrawConstraint(ViewerForm viewer, double scale = 1)
@@ -190,11 +209,6 @@ namespace OOPFEM
                     }
                 }
             }
-            foreach (var items in bc)
-            {
-                Console.Write(items + "\t");
-            }
-            Console.WriteLine();
             return bc.ToArray();
         }
 
@@ -245,6 +259,8 @@ namespace OOPFEM
             ApplyBoundaryCondition(bc, ref K, ref F);
             DenseVector u = (DenseVector)K.Solve(F);
             uGlobal = (DenseVector)u.Clone();
+            WriteArrayMessagePackFormatter("uglobal.data", uGlobal.ToArray());
+            uGlobal = ReadArrayMessagePackFormatter("uglobal.data");
             Console.WriteLine(u.ToString());
             for (int i = 0; i < listNodes.Count; i++)
             {
@@ -287,13 +303,26 @@ namespace OOPFEM
             DenseVector F = new DenseVector(listNodes.Count * NumberOfFeild);
             for (int i = 0; i < listForces.Count; i++)
             {
-                Force f = listForces[i];
-                Node n = f.GetNode();
-                DenseVector re = f.ComputeVectorFroce();
-                int[] tArrayNode = n.TArray;
-                for (int j = 0; j < tArrayNode.Length; j++)
+                AbstractLoad f = listForces[i];
+                if (f is Force)
                 {
-                    F[tArrayNode[j]] += re[j];
+                    Node n = ((Force)f).GetNode();
+                    DenseVector re = f.ComputeVectorFroce();
+                    int[] tArrayNode = n.TArray;
+                    for (int j = 0; j < tArrayNode.Length; j++)
+                    {
+                        F[tArrayNode[j]] += re[j];
+                    }
+                }
+                else if (f is PressureEdge2D)
+                {
+                    PressureEdge2D press = (PressureEdge2D)f;
+                    DenseVector re = press.ComputeVectorFroce();
+                    int[] tArrayElement = press.GetElements().TArray;
+                    for (int j = 0; j < tArrayElement.Length; j++)
+                    {
+                        F[tArrayElement[j]] += re[j];
+                    }
                 }
             }
             return F;
@@ -306,6 +335,7 @@ namespace OOPFEM
             {
                 AbstractELement element = listElements[i];
                 DenseMatrix Ke = element.ComputeStiffnessMatrix();
+                Console.WriteLine(Ke.ToString());
                 int[] tArrayElement = element.TArray;
                 for (int j = 0; j < tArrayElement.Count(); j++)
                 {
@@ -323,20 +353,42 @@ namespace OOPFEM
             int countElement = listElements.Count;
             for (int i = 0; i < countElement; i++)
             {
-                Node n0 = listElements[i].GetNode(0);
-                Node n1 = listElements[i].GetNode(1);
-                Line line = new Line(
-                        n0.GetLocation(0) + scale * n0.GetU(0),
+                if (listElements[i] is Truss3DElement)
+                {
+                    Node n0 = listElements[i].GetNode(0);
+                    Node n1 = listElements[i].GetNode(1);
+                    Line line = new Line(
+                            n0.GetLocation(0) + scale * n0.GetU(0),
+                            n0.GetLocation(1) + scale * n0.GetU(1),
+                            n0.GetLocation(2) + scale * n0.GetU(2),
+                            n1.GetLocation(0) + scale * n1.GetU(0),
+                            n1.GetLocation(1) + scale * n1.GetU(1),
+                            n1.GetLocation(2) + scale * n1.GetU(2)
+                        );
+                    line.SetColor(Color.Orange);
+                    line.SetDashedLine(true);
+                    line.SetWidth(3);
+                    viewer.AddObject3D(line);
+                }
+                else if (listElements[i] is T3Elements)
+                {
+                    Node n0 = listElements[i].GetNode(0);
+                    Node n1 = listElements[i].GetNode(1);
+                    Node n2 = listElements[i].GetNode(2);
+                    Triangle tri = new Triangle(n0.GetLocation(0) + scale * n0.GetU(0),
                         n0.GetLocation(1) + scale * n0.GetU(1),
-                        n0.GetLocation(2) + scale * n0.GetU(2),
+                        0,
                         n1.GetLocation(0) + scale * n1.GetU(0),
                         n1.GetLocation(1) + scale * n1.GetU(1),
-                        n1.GetLocation(2) + scale * n1.GetU(2)
-                    );
-                line.SetColor(Color.Orange);
-                line.SetDashedLine(true);
-                line.SetWidth(3);
-                viewer.AddObject3D(line);
+                        0,
+                        n2.GetLocation(0) + scale * n2.GetU(0),
+                        n2.GetLocation(1) + scale * n2.GetU(1),
+                        0);
+                    //tri.SetRandomColor();
+                    tri.SetColor(Color.Yellow);
+                    tri.SetOpacity(0.5);
+                    viewer.AddObject3D(tri);
+                }
             }
         }
         internal void DrawReactionFroces(ViewerForm viewer, double scale = 1)

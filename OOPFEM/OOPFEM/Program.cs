@@ -136,33 +136,95 @@ namespace OOPFEM
             //viewer.UpdateCamera();
             //viewer.Run();
 
-            double E = 10e9;
-            double nu = 0.25;
+            //double E = 10e9;
+            //double nu = 0.25;
+            //Node n1 = new Node(0, 0);
+            //Node n2 = new Node(0, 2);
+            //Node n3 = new Node(2, 0);
+            //Node n4 = new Node(2, 2);
+
+            //Model model = new Model(2);
+            //model.AddNode(n1);
+            //model.AddNode(n2);
+            //model.AddNode(n3);
+            //model.AddNode(n4);
+
+            //Constraint c1 = new Constraint(n1, true, true, false);
+            //Constraint c2 = new Constraint(n3, true, true, false);
+
+            //ViewerForm viewer = new ViewerForm(true);
+
+            //T3Elements element = new T3Elements(E, nu, n1, n3, n2);
+            //T3Elements element1 = new T3Elements(E, nu, n4, n2, n3);
+
+            //PressureEdge2D pressure = new PressureEdge2D(element1, 0, 1e3, 0);
+            //model.AddElement(element);
+            //model.AddElement(element1);
+            //model.AddConstrain(c1);
+            //model.AddConstrain(c2);
+            //model.AddForce(pressure);
+
+            double E = 10e6;
+            double nu = 0.3;
+
             Node n1 = new Node(0, 0);
-            Node n2 = new Node(0, 2);
-            Node n3 = new Node(2, 0);
-            Node n4 = new Node(2, 2);
+            Node n2 = new Node(0, 1);
+            Node n3 = new Node(1, 0);
+            Node n4 = new Node(1, 1);
+            Node n5 = new Node(2, 0);
+            Node n6 = new Node(2, 1);
+            Node n7 = new Node(3, 0);
+            Node n8 = new Node(3, 1);
+            Node n9 = new Node(4, 0);
+            Node n10 = new Node(4, 1);
 
             Model model = new Model(2);
             model.AddNode(n1);
             model.AddNode(n2);
             model.AddNode(n3);
             model.AddNode(n4);
+            model.AddNode(n5);
+            model.AddNode(n6);
+            model.AddNode(n7);
+            model.AddNode(n8);
+            model.AddNode(n9);
+            model.AddNode(n10);
 
+            T3Elements t1 = new T3Elements(E, nu, n1, n3, n4);
+            T3Elements t2 = new T3Elements(E, nu, n4, n2, n1);
+            T3Elements t3 = new T3Elements(E, nu, n3, n5, n6);
+            T3Elements t4 = new T3Elements(E, nu, n6, n4, n3);
+            T3Elements t5 = new T3Elements(E, nu, n5, n7, n8);
+            T3Elements t6 = new T3Elements(E, nu, n8, n6, n5);
+            T3Elements t7 = new T3Elements(E, nu, n7, n9, n10);
+            T3Elements t8 = new T3Elements(E, nu, n10, n8, n7);
+
+            model.AddElement(t1);
+            model.AddElement(t2);
+            model.AddElement(t3);
+            model.AddElement(t4);
+            model.AddElement(t5);
+            model.AddElement(t6);
+            model.AddElement(t7);
+            model.AddElement(t8);
+
+            Constraint c2 = new Constraint(n2, true, false, false);
             Constraint c1 = new Constraint(n1, true, true, false);
-            Constraint c2 = new Constraint(n3, true, true, false);
 
+            PressureEdge2D pressure = new PressureEdge2D(t7, 1, 10e3, 0);
+
+            model.AddConstrain(c1);
+            model.AddConstrain(c2);
+            model.AddForce(pressure);
             ViewerForm viewer = new ViewerForm(true);
 
-            T3Elements element = new T3Elements(E, nu, n1, n3, n2);
-            T3Elements element1 = new T3Elements(E, nu, n4, n2, n3);
-            model.AddElement(element);
-            model.AddElement(element1);
-            model.AddConstrain(c1);
-            model.AddConstrain(c2); 
             model.DrawNode(viewer);
             model.DrawElement(viewer);
-            model.DrawConstraint(viewer,1e-1);
+            model.DrawConstraint(viewer, 1e-1);
+            model.DrawForce(viewer, 5e-5);
+            model.PreProcessing();
+            model.Solve();
+            model.DrawDeformation(viewer, 1e2);
             viewer.UpdateCamera();
             viewer.Run();
         }

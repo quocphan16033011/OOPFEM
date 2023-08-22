@@ -17,7 +17,28 @@ namespace OOPFEM
             this.indexEgde = indexEgde;
             valueForce = new double[] { px, py };
         }
-
+        public T3Elements GetElements() { return element; }
+        public int IndexEdge() { return indexEgde; }
+        public Node[] GetNodesOnEdge()
+        {
+            Node[] nodes = new Node[2];
+            switch (indexEgde)
+            {
+                case 0:
+                    nodes[0] = element.GetNode(0);
+                    nodes[1] = element.GetNode(1);
+                    break;
+                case 1:
+                    nodes[0] = element.GetNode(1);
+                    nodes[1] = element.GetNode(2);
+                    break;
+                case 2:
+                    nodes[0] = element.GetNode(2);
+                    nodes[1] = element.GetNode(0);
+                    break;
+            }
+            return nodes;
+        }
         internal override DenseVector ComputeVectorFroce()
         {
             DenseVector LoadVec = new DenseVector(2 * element.CountNodes());
