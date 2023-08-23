@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace OOPFEM
 {
-    internal class T3Elements : AbstractELement
+    internal class T3Elements : AbstractPlaneElement
     {
-        private double nu { get; set; }
+
 
         public T3Elements(double E, double nu, Node node1, Node node2, Node node3)
         {

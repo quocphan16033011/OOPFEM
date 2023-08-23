@@ -9,15 +9,15 @@ namespace OOPFEM
 {
     internal class PressureEdge2D : AbstractLoad
     {
-        private T3Elements element;
+        private AbstractPlaneElement element;
         private int indexEgde;
-        public PressureEdge2D(T3Elements element, int indexEgde, double px, double py)
+        public PressureEdge2D(AbstractPlaneElement element, int indexEgde, double px, double py)
         {
             this.element = element;
             this.indexEgde = indexEgde;
             valueForce = new double[] { px, py };
         }
-        public T3Elements GetElements() { return element; }
+        public AbstractPlaneElement GetElements() { return element; }
         public int IndexEdge() { return indexEgde; }
         public Node[] GetNodesOnEdge()
         {
@@ -33,8 +33,23 @@ namespace OOPFEM
                     nodes[1] = element.GetNode(2);
                     break;
                 case 2:
-                    nodes[0] = element.GetNode(2);
-                    nodes[1] = element.GetNode(0);
+                    if (element is T3Elements)
+                    {
+                        nodes[0] = element.GetNode(2);
+                        nodes[1] = element.GetNode(0);
+                    }
+                    else if (element is Q4Element)
+                    {
+                        nodes[0] = element.GetNode(2);
+                        nodes[1] = element.GetNode(3);
+                    }
+                    break;
+                case 3:
+                    if (element is Q4Element)
+                    {
+                        nodes[0] = element.GetNode(3);
+                        nodes[1] = element.GetNode(0);
+                    }
                     break;
             }
             return nodes;

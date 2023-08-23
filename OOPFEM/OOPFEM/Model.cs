@@ -111,6 +111,20 @@ namespace OOPFEM
                     tri.SetColor(Color.Green);
                     viewer.AddObject3D(tri);
                 }
+                else if (listElements[i] is Q4Element)
+                {
+                    Node n0 = listElements[i].GetNode(0);
+                    Node n1 = listElements[i].GetNode(1);
+                    Node n2 = listElements[i].GetNode(2);
+                    Node n3 = listElements[i].GetNode(3);
+                    Quadrilateral quadrilateral = new Quadrilateral(n0.GetLocation(0), n0.GetLocation(1),
+                        n1.GetLocation(0), n1.GetLocation(1),
+                        n2.GetLocation(0), n2.GetLocation(1),
+                        n3.GetLocation(0), n3.GetLocation(1));
+                    //tri.SetRandomColor();
+                    quadrilateral.SetColor(Color.Green);
+                    viewer.AddObject3D(quadrilateral);
+                }
             }
         }
         public void DrawForce(ViewerForm viewer, double scale = 1)

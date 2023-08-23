@@ -207,3 +207,6 @@ E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\obj\Debug\OOPFEM.pdb
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.dll
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.pdb
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.xml
+E:\My file\Code\C#\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.dll
+E:\My file\Code\C#\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.pdb
+E:\My file\Code\C#\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Microsoft.NET.StringTools.xml

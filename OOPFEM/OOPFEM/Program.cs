@@ -164,67 +164,126 @@ namespace OOPFEM
             //model.AddConstrain(c2);
             //model.AddForce(pressure);
 
-            double E = 10e6;
+            //double E = 10e6;
+            //double nu = 0.3;
+
+            //Node n1 = new Node(0, 0);
+            //Node n2 = new Node(0, 1);
+            //Node n3 = new Node(1, 0);
+            //Node n4 = new Node(1, 1);
+            //Node n5 = new Node(2, 0);
+            //Node n6 = new Node(2, 1);
+            //Node n7 = new Node(3, 0);
+            //Node n8 = new Node(3, 1);
+            //Node n9 = new Node(4, 0);
+            //Node n10 = new Node(4, 1);
+
+            //Model model = new Model(2);
+            //model.AddNode(n1);
+            //model.AddNode(n2);
+            //model.AddNode(n3);
+            //model.AddNode(n4);
+            //model.AddNode(n5);
+            //model.AddNode(n6);
+            //model.AddNode(n7);
+            //model.AddNode(n8);
+            //model.AddNode(n9);
+            //model.AddNode(n10);
+
+            //T3Elements t1 = new T3Elements(E, nu, n1, n3, n4);
+            //T3Elements t2 = new T3Elements(E, nu, n4, n2, n1);
+            //T3Elements t3 = new T3Elements(E, nu, n3, n5, n6);
+            //T3Elements t4 = new T3Elements(E, nu, n6, n4, n3);
+            //T3Elements t5 = new T3Elements(E, nu, n5, n7, n8);
+            //T3Elements t6 = new T3Elements(E, nu, n8, n6, n5);
+            //T3Elements t7 = new T3Elements(E, nu, n7, n9, n10);
+            //T3Elements t8 = new T3Elements(E, nu, n10, n8, n7);
+
+            //model.AddElement(t1);
+            //model.AddElement(t2);
+            //model.AddElement(t3);
+            //model.AddElement(t4);
+            //model.AddElement(t5);
+            //model.AddElement(t6);
+            //model.AddElement(t7);
+            //model.AddElement(t8);
+
+            //Constraint c2 = new Constraint(n2, true, false, false);
+            //Constraint c1 = new Constraint(n1, true, true, false);
+
+            //PressureEdge2D pressure = new PressureEdge2D(t7, 1, 10e3, 0);
+
+            double E = 10e7;
             double nu = 0.3;
 
-            Node n1 = new Node(0, 0);
-            Node n2 = new Node(0, 1);
-            Node n3 = new Node(1, 0);
-            Node n4 = new Node(1, 1);
-            Node n5 = new Node(2, 0);
-            Node n6 = new Node(2, 1);
-            Node n7 = new Node(3, 0);
-            Node n8 = new Node(3, 1);
-            Node n9 = new Node(4, 0);
-            Node n10 = new Node(4, 1);
+            double L = 10;
+            double h = 2;
+            int nx = 2;// so phan tu tren canh ngang
+            int ny = 1;// so phan tu tren canh dung
+            double p = 1e6;
+
+
+            Node[,] listnodes = new Node[nx + 1, ny + 1];
+            AbstractPlaneElement[,] listElements = new Q4Element[nx, ny];
+            double dy = h / ny;
+            double dx = L / nx;
+
+            for (int i = 0; i < ny + 1; i++)
+            {
+                for (int j = 0; j < nx + 1; j++)
+                {
+                    listnodes[j, i] = new Node(dx * j, dy * i);
+                }
+            }
+
+            for (int i = 0; i < ny; i++)
+            {
+                for (int j = 0; j < nx; j++)
+                {
+                    listElements[j, i] = new Q4Element(E, nu, listnodes[j, i], listnodes[j + 1, i], listnodes[j + 1, i + 1], listnodes[j, i + 1]);
+                }
+            }
 
             Model model = new Model(2);
-            model.AddNode(n1);
-            model.AddNode(n2);
-            model.AddNode(n3);
-            model.AddNode(n4);
-            model.AddNode(n5);
-            model.AddNode(n6);
-            model.AddNode(n7);
-            model.AddNode(n8);
-            model.AddNode(n9);
-            model.AddNode(n10);
 
-            T3Elements t1 = new T3Elements(E, nu, n1, n3, n4);
-            T3Elements t2 = new T3Elements(E, nu, n4, n2, n1);
-            T3Elements t3 = new T3Elements(E, nu, n3, n5, n6);
-            T3Elements t4 = new T3Elements(E, nu, n6, n4, n3);
-            T3Elements t5 = new T3Elements(E, nu, n5, n7, n8);
-            T3Elements t6 = new T3Elements(E, nu, n8, n6, n5);
-            T3Elements t7 = new T3Elements(E, nu, n7, n9, n10);
-            T3Elements t8 = new T3Elements(E, nu, n10, n8, n7);
+            for (int i = 0; i < ny + 1; i++)
+            {
+                for (int j = 0; j < nx + 1; j++)
+                {
+                    model.AddNode(listnodes[j, i]);
+                }
+            }
 
-            model.AddElement(t1);
-            model.AddElement(t2);
-            model.AddElement(t3);
-            model.AddElement(t4);
-            model.AddElement(t5);
-            model.AddElement(t6);
-            model.AddElement(t7);
-            model.AddElement(t8);
 
-            Constraint c2 = new Constraint(n2, true, false, false);
-            Constraint c1 = new Constraint(n1, true, true, false);
+            for (int i = 0; i < ny; i++)
+            {
+                for (int j = 0; j < nx; j++)
+                {
+                    model.AddElement(listElements[j, i]);
+                }
 
-            PressureEdge2D pressure = new PressureEdge2D(t7, 1, 10e3, 0);
+            }
+            for (int i = 0; i < ny; i++)
+            {
+                PressureEdge2D pressure = new PressureEdge2D(listElements[nx - 1, i], 1, 0, p);
+                model.AddForce(pressure);
+            }
 
-            model.AddConstrain(c1);
-            model.AddConstrain(c2);
-            model.AddForce(pressure);
+            for (int i = 0; i < ny + 1; i++)
+            {
+                Constraint c = new Constraint(listnodes[0, i], true, true, false);
+                model.AddConstrain(c);
+            }
+
             ViewerForm viewer = new ViewerForm(true);
 
             model.DrawNode(viewer);
             model.DrawElement(viewer);
-            model.DrawConstraint(viewer, 1e-1);
-            model.DrawForce(viewer, 5e-5);
+            model.DrawConstraint(viewer);
+            model.DrawForce(viewer, 2e-7);
             model.PreProcessing();
             model.Solve();
-            model.DrawDeformation(viewer, 1e2);
+            //model.DrawDeformation(viewer, 1e2);
             viewer.UpdateCamera();
             viewer.Run();
         }
