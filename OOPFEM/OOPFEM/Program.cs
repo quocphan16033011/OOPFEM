@@ -218,8 +218,8 @@ namespace OOPFEM
 
             double L = 10;
             double h = 2;
-            int nx = 2;// so phan tu tren canh ngang
-            int ny = 1;// so phan tu tren canh dung
+            int nx = 9;// so phan tu tren canh ngang
+            int ny = 5;// so phan tu tren canh dung
             double p = 1e6;
 
 
@@ -283,7 +283,8 @@ namespace OOPFEM
             model.DrawForce(viewer, 2e-7);
             model.PreProcessing();
             model.Solve();
-            //model.DrawDeformation(viewer, 1e2);
+            //model.DrawDeformation(viewer, 1);
+            model.DrawResults(Result.USUM, nx+1,ny+1,viewer,0.25);
             viewer.UpdateCamera();
             viewer.Run();
         }

@@ -105,7 +105,6 @@ E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\OOPFEM.exe.config
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\OOPFEM.exe
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\OOPFEM.pdb
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\MathNet.Numerics.dll
-E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Kitware.VTK.dll
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\DEMSoft.Common.dll
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\Kitware.mummy.Runtime.dll
 E:\Quoc\Learn\OOPFEM\OOPFEM\OOPFEM\bin\Debug\NMath.dll

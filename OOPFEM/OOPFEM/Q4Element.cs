@@ -73,8 +73,8 @@ namespace OOPFEM
                     for (int kk = 0; kk < nodes.Length; kk++)
                     {
                         B[0, 2 * kk] = Jacobi[1, 1] * dNdxi[0, kk] - Jacobi[0, 1] * dNdxi[1, kk];
-                        B[1, 2 * kk + 1] = -Jacobi[1, 0] * dNdxi[0, kk] - Jacobi[0, 0] * dNdxi[1, kk];
-                        B[2, 2 * kk] = -Jacobi[1, 0] * dNdxi[0, kk] - Jacobi[0, 0] * dNdxi[1, kk];
+                        B[1, 2 * kk + 1] = -Jacobi[1, 0] * dNdxi[0, kk] + Jacobi[0, 0] * dNdxi[1, kk];
+                        B[2, 2 * kk] = -Jacobi[1, 0] * dNdxi[0, kk] + Jacobi[0, 0] * dNdxi[1, kk];
                         B[2, 2 * kk + 1] = Jacobi[1, 1] * dNdxi[0, kk] - Jacobi[0, 1] * dNdxi[1, kk];
 
                     }

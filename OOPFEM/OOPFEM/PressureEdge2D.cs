@@ -84,7 +84,32 @@ namespace OOPFEM
                     LoadVec[5] = totalForceY / 2.0;
                     break;
                 case 2:
-                    n0 = element.GetNode(2);
+                    if (element is T3Elements)
+                    {
+                        n0 = element.GetNode(2);
+                        n1 = element.GetNode(0);
+                        length = n0.GetDistance(n1);
+                        totalForceX = valueForce[0] * length;
+                        totalForceY = valueForce[1] * length;
+                        LoadVec[4] = totalForceX / 2.0;
+                        LoadVec[5] = totalForceY / 2.0;
+                        LoadVec[0] = totalForceX / 2.0;
+                        LoadVec[1] = totalForceY / 2.0;
+                    } else if (element is Q4Element)
+                    {
+                        n0 = element.GetNode(2);
+                        n1 = element.GetNode(3);
+                        length = n0.GetDistance(n1);
+                        totalForceX = valueForce[0] * length;
+                        totalForceY = valueForce[1] * length;
+                        LoadVec[4] = totalForceX / 2.0;
+                        LoadVec[5] = totalForceY / 2.0;
+                        LoadVec[0] = totalForceX / 2.0;
+                        LoadVec[1] = totalForceY / 2.0;
+                    }
+                    break;
+                case 3:
+                    n0 = element.GetNode(3);
                     n1 = element.GetNode(0);
                     length = n0.GetDistance(n1);
                     totalForceX = valueForce[0] * length;

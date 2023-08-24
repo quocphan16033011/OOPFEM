@@ -39,6 +39,7 @@
     <Reference Include="DEMSoft.Drawing">
       <HintPath>..\..\..\..\..\File in here\LibraryIGA_2023\LibraryIGA_2023\DEMSoft.Drawing.dll</HintPath>
     </Reference>
+    <Reference Include="Kitware.VTK, Version=5.8.0.607, Culture=neutral, PublicKeyToken=995c7fb9db2c1b44" />
     <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
     </Reference>

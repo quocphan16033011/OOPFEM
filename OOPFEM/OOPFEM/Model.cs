@@ -1,5 +1,6 @@
 ﻿using DEMSoft.Drawing;
 using DEMSoft.Drawing.Geometry;
+using Kitware.VTK;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MessagePack;
 using System;
@@ -12,6 +13,10 @@ using System.Threading.Tasks;
 
 namespace OOPFEM
 {
+    public enum Result
+    {
+        UX, UY, UZ, USUM
+    }
     class Model
     {
         private List<Node> listNodes;
@@ -403,6 +408,24 @@ namespace OOPFEM
                     tri.SetOpacity(0.5);
                     viewer.AddObject3D(tri);
                 }
+                else if (listElements[i] is Q4Element)
+                {
+                    Node n0 = listElements[i].GetNode(0);
+                    Node n1 = listElements[i].GetNode(1);
+                    Node n2 = listElements[i].GetNode(2);
+                    Node n3 = listElements[i].GetNode(3);
+                    Quadrilateral quadrilateral = new Quadrilateral(n0.GetLocation(0) + scale * n0.GetU(0), n0.GetLocation(1) + scale * n0.GetU(1),
+                        n1.GetLocation(0) + scale * n1.GetU(0),
+                        n1.GetLocation(1) + scale * n1.GetU(1),
+                        n2.GetLocation(0) + scale * n2.GetU(0),
+                        n2.GetLocation(1) + scale * n2.GetU(1),
+                        n3.GetLocation(0) + scale * n3.GetU(0),
+                        n3.GetLocation(1) + scale * n3.GetU(1));
+                    //tri.SetRandomColor();
+                    quadrilateral.SetColor(Color.Yellow);
+                    quadrilateral.SetOpacity(0.5);
+                    viewer.AddObject3D(quadrilateral);
+                }
             }
         }
         internal void DrawReactionFroces(ViewerForm viewer, double scale = 1)
@@ -484,6 +507,57 @@ namespace OOPFEM
             double[] v = MessagePackSerializer.Deserialize<double[]>(stream);
             stream.Close();
             return v;
+        }
+
+        public void DrawResults(Result resultName, int numberOfNodeX, int numberOfNodeY, ViewerForm viewer, double scale = 1)
+        {
+
+            double[,] x = new double[numberOfNodeX, numberOfNodeY];
+            double[,] y = new double[numberOfNodeX, numberOfNodeY];
+            double[,] z = new double[numberOfNodeX, numberOfNodeY];
+            double[,] val = new double[numberOfNodeX, numberOfNodeY];
+            double max = -9999999999999;
+            double min = 999999999999;
+            int c = 0;
+            for (int i = 0; i < numberOfNodeY; i++)
+            {
+                for (int j = 0; j < numberOfNodeX; j++)
+                {
+                    x[j, i] = listNodes[c].GetLocation(0) + scale * listNodes[c].GetU(0);
+                    y[j, i] = listNodes[c].GetLocation(1) + scale * listNodes[c].GetU(1);
+                    switch (resultName)
+                    {
+                        case Result.UX:
+                            val[j, i] = listNodes[c].GetU(0);
+                            break;
+                        case Result.UY:
+                            val[j, i] = listNodes[c].GetU(1);
+                            break;
+                        case Result.UZ:
+                            val[j, i] = listNodes[c].GetU(2);
+                            break;
+                        case Result.USUM:
+                            val[j, i] = Math.Sqrt(Math.Pow(listNodes[c].GetU(0), 2) + Math.Pow(listNodes[c].GetU(1), 2));
+                            break;
+                    }
+                    if (val[j, i] < min)
+                    {
+                        min = val[j, i];
+                    }
+                    else if (val[j, i] > max) 
+                    { max = val[j, i]; }
+                    c++;
+                }
+            }
+            Contours2D contour = new Contours2D(x, y, z);
+            contour.ColorType = ColorType.Jet;
+            contour.SetScalarValue(val);
+            contour.SetMinMaxValue(min, max);
+            contour.Update(min, max);
+            viewer.AddObject3D(contour);
+            //ColorsRange a = new ColorsRange(ColorType.Jet,20);
+            //viewer.SetColormapBarVisible(a, resultName.ToString(), Orientation.Horizontal);
+            //viewer.GetColormapBar();
         }
     }
 }
